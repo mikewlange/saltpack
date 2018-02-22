@@ -23,12 +23,21 @@ func TestEncryptedBlockV2RoundTrip(t *testing.T) {
 		IsFinal: isFinal,
 	}
 
-	blockV2Bytes, err := encodeToBytes(blockV2)
+	blockV2Bytes1, err := blockV2.MarshalBinary()
 	require.NoError(t, err)
 
-	var blockV2Decoded encryptionBlockV2
-	decodeFromBytes(&blockV2Decoded, blockV2Bytes)
+	blockV2Bytes2, err := encodeToBytes(blockV2)
+	require.NoError(t, err)
 
+	require.Equal(t, blockV2Bytes1, blockV2Bytes2)
+
+	var blockV2Unmarshalled encryptionBlockV2
+	err = blockV2Unmarshalled.UnmarshalBinary(blockV2Bytes1)
+	require.NoError(t, err)
+	require.Equal(t, blockV2, blockV2Unmarshalled)
+
+	var blockV2Decoded encryptionBlockV2
+	decodeFromBytes(&blockV2Decoded, blockV2Bytes1)
 	require.Equal(t, blockV2, blockV2Decoded)
 }
 

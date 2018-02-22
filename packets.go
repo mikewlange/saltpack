@@ -3,7 +3,10 @@
 
 package saltpack
 
-import "fmt"
+import (
+	"encoding"
+	"fmt"
+)
 
 type receiverKeys struct {
 	_struct       bool   `codec:",toarray"`
@@ -53,6 +56,18 @@ type encryptionBlockV1 struct {
 type encryptionBlockV2 struct {
 	encryptionBlockV1
 	IsFinal bool `codec:"final"`
+}
+
+var _ encoding.BinaryMarshaler = encryptionBlockV2{}
+var _ encoding.BinaryUnmarshaler = (*encryptionBlockV2)(nil)
+
+func (b encryptionBlockV2) MarshalBinary() (data []byte, err error) {
+	fields := []interface{}{b.IsFinal, b.HashAuthenticators, b.PayloadCiphertext}
+	return nil, nil
+}
+
+func (b *encryptionBlockV2) UnmarshalBinary(data []byte) error {
+	return nil
 }
 
 func (h *EncryptionHeader) validate(versionValidator func(Version) error) error {
