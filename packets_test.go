@@ -9,6 +9,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// Test that the encoded field order for encryptionBlockV2 puts
+// IsFinal first.
 func TestEncryptedBlockV2Serialization(t *testing.T) {
 	isFinal := true
 	hashAuthenticators := []payloadAuthenticator{{0x1}, {0x2}}
