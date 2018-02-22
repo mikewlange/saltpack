@@ -9,12 +9,35 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// Test that encryptedBlockV2 encodes and decodes properly.
+func TestEncryptedBlockV2RoundTrip(t *testing.T) {
+	isFinal := false
+	hashAuthenticators := []payloadAuthenticator{{0x1}, {0x2}}
+	payloadCiphertext := []byte("TestEncryptedBlockV2RoundTrip")
+
+	blockV2 := encryptionBlockV2{
+		encryptionBlockV1: encryptionBlockV1{
+			HashAuthenticators: hashAuthenticators,
+			PayloadCiphertext:  payloadCiphertext,
+		},
+		IsFinal: isFinal,
+	}
+
+	blockV2Bytes, err := encodeToBytes(blockV2)
+	require.NoError(t, err)
+
+	var blockV2Decoded encryptionBlockV2
+	decodeFromBytes(&blockV2Decoded, blockV2Bytes)
+
+	require.Equal(t, blockV2, blockV2Decoded)
+}
+
 // Test that the encoded field order for encryptionBlockV2 puts
 // IsFinal first.
-func TestEncryptedBlockV2Serialization(t *testing.T) {
+func TestEncryptedBlockV2FieldOrder(t *testing.T) {
 	isFinal := true
-	hashAuthenticators := []payloadAuthenticator{{0x1}, {0x2}}
-	payloadCiphertext := []byte("some ciphertext")
+	hashAuthenticators := []payloadAuthenticator{{0x3}, {0x4}}
+	payloadCiphertext := []byte("TestEncryptedBlockV2FieldOrder")
 
 	blockV2 := encryptionBlockV2{
 		encryptionBlockV1: encryptionBlockV1{
