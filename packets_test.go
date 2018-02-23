@@ -10,11 +10,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// Test that encryptedBlockV2 encodes and decodes properly.
-func TestEncryptedBlockV2RoundTrip(t *testing.T) {
+// Test that encryptionBlockV2 encodes and decodes properly.
+func TestEncryptionBlockV2RoundTrip(t *testing.T) {
 	isFinal := false
 	hashAuthenticators := []payloadAuthenticator{{0x1}, {0x2}}
-	payloadCiphertext := []byte("TestEncryptedBlockV2RoundTrip")
+	payloadCiphertext := []byte("TestEncryptionBlockV2RoundTrip")
 
 	blockV2 := encryptionBlockV2{
 		encryptionBlockV1: encryptionBlockV1{
@@ -49,10 +49,10 @@ func TestEncryptedBlockV2RoundTrip(t *testing.T) {
 
 // Test that the encoded field order for encryptionBlockV2 puts
 // IsFinal first.
-func TestEncryptedBlockV2FieldOrder(t *testing.T) {
+func TestEncryptionBlockV2FieldOrder(t *testing.T) {
 	isFinal := true
 	hashAuthenticators := []payloadAuthenticator{{0x3}, {0x4}}
-	payloadCiphertext := []byte("TestEncryptedBlockV2FieldOrder")
+	payloadCiphertext := []byte("TestEncryptionBlockV2FieldOrder")
 
 	blockV2 := encryptionBlockV2{
 		encryptionBlockV1: encryptionBlockV1{
