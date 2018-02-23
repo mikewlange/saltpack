@@ -41,7 +41,9 @@ func TestEncryptedBlockV2RoundTrip(t *testing.T) {
 	require.Equal(t, blockV2, blockV2Decoded1)
 
 	var blockV2Decoded2 encryptionBlockV2
-	decodeFromBytes(&blockV2Decoded2, blockV2Bytes1)
+	err = decodeFromBytes(&blockV2Decoded2, blockV2Bytes1)
+	require.NoError(t, err)
+
 	require.Equal(t, blockV2, blockV2Decoded2)
 }
 
@@ -63,9 +65,13 @@ func TestEncryptedBlockV2FieldOrder(t *testing.T) {
 	blockV2Bytes, err := encodeToBytes(blockV2)
 	require.NoError(t, err)
 
-	blockV2Fields := []interface{}{isFinal, hashAuthenticators, payloadCiphertext}
-	expectedBytes, err := encodeToBytes(blockV2Fields)
+	var blockV2Decoded encryptionBlockV2
+	err = decodeFromBytes([]interface{}{
+		&blockV2Decoded.IsFinal,
+		&blockV2Decoded.HashAuthenticators,
+		&blockV2Decoded.PayloadCiphertext,
+	}, blockV2Bytes)
 	require.NoError(t, err)
 
-	require.Equal(t, expectedBytes, blockV2Bytes)
+	require.Equal(t, blockV2, blockV2Decoded)
 }
