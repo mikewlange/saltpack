@@ -90,21 +90,21 @@ func TestSignatureBlockV2RoundTrip(t *testing.T) {
 		IsFinal: isFinal,
 	}
 
-	// h := codecHandle()
+	h := codecHandle()
 
-	/*	var blockV2Bytes1 []byte
-		encoder := codec.NewEncoderBytes(&blockV2Bytes1, h)
-		blockV2.CodecEncodeSelf(encoder) */
+	var blockV2Bytes1 []byte
+	encoder := codec.NewEncoderBytes(&blockV2Bytes1, h)
+	blockV2.CodecEncodeSelf(encoder)
 
-	blockV2Bytes1, err := encodeToBytes(blockV2)
+	blockV2Bytes2, err := encodeToBytes(blockV2)
 	require.NoError(t, err)
 
-	//	require.Equal(t, blockV2Bytes1, blockV2Bytes2)
+	require.Equal(t, blockV2Bytes1, blockV2Bytes2)
 
-	/*var blockV2Decoded1 signatureBlockV2
+	var blockV2Decoded1 signatureBlockV2
 	decoder := codec.NewDecoderBytes(blockV2Bytes1, h)
 	blockV2Decoded1.CodecDecodeSelf(decoder)
-	require.Equal(t, blockV2, blockV2Decoded1) */
+	require.Equal(t, blockV2, blockV2Decoded1)
 
 	var blockV2Decoded2 signatureBlockV2
 	err = decodeFromBytes(&blockV2Decoded2, blockV2Bytes1)

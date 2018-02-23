@@ -171,3 +171,25 @@ type signatureBlockV2 struct {
 	signatureBlockV1
 	IsFinal bool `codec:"final"`
 }
+
+// Make *signatureBlockV2 implement codec.Selfer to encode IsFinal
+// first, to preserve the behavior noticed in this issue:
+// https://github.com/keybase/saltpack/pull/43 .
+
+var _ codec.Selfer = (*signatureBlockV2)(nil)
+
+func (b *signatureBlockV2) CodecEncodeSelf(e *codec.Encoder) {
+	e.MustEncode([]interface{}{
+		b.IsFinal,
+		b.Signature,
+		b.PayloadChunk,
+	})
+}
+
+func (b *signatureBlockV2) CodecDecodeSelf(d *codec.Decoder) {
+	d.MustDecode([]interface{}{
+		&b.IsFinal,
+		&b.Signature,
+		&b.PayloadChunk,
+	})
+}
