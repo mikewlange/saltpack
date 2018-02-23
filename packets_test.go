@@ -75,3 +75,69 @@ func TestEncryptionBlockV2FieldOrder(t *testing.T) {
 
 	require.Equal(t, blockV2, blockV2Decoded)
 }
+
+// Test that signatureBlockV2 encodes and decodes properly.
+func TestSignatureBlockV2RoundTrip(t *testing.T) {
+	isFinal := false
+	signature := []byte("TestSignatureBlockV2RoundTrip signature")
+	payloadChunk := []byte("TestSignatureBlockV2RoundTrip payload")
+
+	blockV2 := signatureBlockV2{
+		signatureBlockV1: signatureBlockV1{
+			Signature:    signature,
+			PayloadChunk: payloadChunk,
+		},
+		IsFinal: isFinal,
+	}
+
+	// h := codecHandle()
+
+	/*	var blockV2Bytes1 []byte
+		encoder := codec.NewEncoderBytes(&blockV2Bytes1, h)
+		blockV2.CodecEncodeSelf(encoder) */
+
+	blockV2Bytes1, err := encodeToBytes(blockV2)
+	require.NoError(t, err)
+
+	//	require.Equal(t, blockV2Bytes1, blockV2Bytes2)
+
+	/*var blockV2Decoded1 signatureBlockV2
+	decoder := codec.NewDecoderBytes(blockV2Bytes1, h)
+	blockV2Decoded1.CodecDecodeSelf(decoder)
+	require.Equal(t, blockV2, blockV2Decoded1) */
+
+	var blockV2Decoded2 signatureBlockV2
+	err = decodeFromBytes(&blockV2Decoded2, blockV2Bytes1)
+	require.NoError(t, err)
+
+	require.Equal(t, blockV2, blockV2Decoded2)
+}
+
+// Test that the encoded field order for signatureBlockV2 puts
+// IsFinal first.
+func TestSignatureBlockV2FieldOrder(t *testing.T) {
+	isFinal := true
+	signature := []byte("TestSignatureBlockV2FieldOrder signature")
+	payloadChunk := []byte("TestSignatureBlockV2FieldOrder payload")
+
+	blockV2 := signatureBlockV2{
+		signatureBlockV1: signatureBlockV1{
+			Signature:    signature,
+			PayloadChunk: payloadChunk,
+		},
+		IsFinal: isFinal,
+	}
+
+	blockV2Bytes, err := encodeToBytes(blockV2)
+	require.NoError(t, err)
+
+	var blockV2Decoded signatureBlockV2
+	err = decodeFromBytes([]interface{}{
+		&blockV2Decoded.IsFinal,
+		&blockV2Decoded.Signature,
+		&blockV2Decoded.PayloadChunk,
+	}, blockV2Bytes)
+	require.NoError(t, err)
+
+	require.Equal(t, blockV2, blockV2Decoded)
+}
