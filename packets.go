@@ -4,8 +4,9 @@
 package saltpack
 
 import (
-	"encoding"
 	"fmt"
+
+	"github.com/keybase/go-codec/codec"
 )
 
 type receiverKeys struct {
@@ -58,16 +59,22 @@ type encryptionBlockV2 struct {
 	IsFinal bool `codec:"final"`
 }
 
-var _ encoding.BinaryMarshaler = encryptionBlockV2{}
-var _ encoding.BinaryUnmarshaler = (*encryptionBlockV2)(nil)
+var _ codec.Selfer = (*encryptionBlockV2)(nil)
 
-func (b encryptionBlockV2) MarshalBinary() (data []byte, err error) {
-	fields := []interface{}{b.IsFinal, b.HashAuthenticators, b.PayloadCiphertext}
-	return nil, nil
+func (b *encryptionBlockV2) CodecEncodeSelf(e *codec.Encoder) {
+	e.MustEncode([]interface{}{
+		b.IsFinal,
+		b.HashAuthenticators,
+		b.PayloadCiphertext,
+	})
 }
 
-func (b *encryptionBlockV2) UnmarshalBinary(data []byte) error {
-	return nil
+func (b *encryptionBlockV2) CodecDecodeSelf(d *codec.Decoder) {
+	d.MustDecode([]interface{}{
+		&b.IsFinal,
+		&b.HashAuthenticators,
+		&b.PayloadCiphertext,
+	})
 }
 
 func (h *EncryptionHeader) validate(versionValidator func(Version) error) error {

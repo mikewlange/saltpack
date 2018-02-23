@@ -6,6 +6,7 @@ package saltpack
 import (
 	"testing"
 
+	"github.com/keybase/go-codec/codec"
 	"github.com/stretchr/testify/require"
 )
 
@@ -23,22 +24,25 @@ func TestEncryptedBlockV2RoundTrip(t *testing.T) {
 		IsFinal: isFinal,
 	}
 
-	blockV2Bytes1, err := blockV2.MarshalBinary()
-	require.NoError(t, err)
+	h := codecHandle()
+
+	var blockV2Bytes1 []byte
+	encoder := codec.NewEncoderBytes(&blockV2Bytes1, h)
+	blockV2.CodecEncodeSelf(encoder)
 
 	blockV2Bytes2, err := encodeToBytes(blockV2)
 	require.NoError(t, err)
 
 	require.Equal(t, blockV2Bytes1, blockV2Bytes2)
 
-	var blockV2Unmarshalled encryptionBlockV2
-	err = blockV2Unmarshalled.UnmarshalBinary(blockV2Bytes1)
-	require.NoError(t, err)
-	require.Equal(t, blockV2, blockV2Unmarshalled)
+	var blockV2Decoded1 encryptionBlockV2
+	decoder := codec.NewDecoderBytes(blockV2Bytes1, h)
+	blockV2Decoded1.CodecDecodeSelf(decoder)
+	require.Equal(t, blockV2, blockV2Decoded1)
 
-	var blockV2Decoded encryptionBlockV2
-	decodeFromBytes(&blockV2Decoded, blockV2Bytes1)
-	require.Equal(t, blockV2, blockV2Decoded)
+	var blockV2Decoded2 encryptionBlockV2
+	decodeFromBytes(&blockV2Decoded2, blockV2Bytes1)
+	require.Equal(t, blockV2, blockV2Decoded2)
 }
 
 // Test that the encoded field order for encryptionBlockV2 puts
