@@ -59,6 +59,10 @@ type encryptionBlockV2 struct {
 	IsFinal bool `codec:"final"`
 }
 
+// Make *encryptionBlockV2 implement codec.Selfer to encode IsFinal
+// first, to preserve the behavior noticed in this issue:
+// https://github.com/keybase/saltpack/pull/43 .
+
 var _ codec.Selfer = (*encryptionBlockV2)(nil)
 
 func (b *encryptionBlockV2) CodecEncodeSelf(e *codec.Encoder) {
